@@ -5,28 +5,28 @@ const trgb = new TerrainRGB(url, 512)
 
 describe('success case', (): void => {
   
-  test('30.0529622, -1.9575129', async() => {
-    const elevation = await trgb.getElevation([30.0529622, -1.9575129], 15);
-    expect(elevation).toEqual(1452);
+  test('30.48535, -2.03089 ', async() => {
+    const elevation = await trgb.getElevation([30.48535, -2.03089], 15);
+    expect(elevation).toEqual(1347);
   });
 
-  test('29.500, -1.786', async() => {
-    const elevation = await trgb.getElevation([29.500, -1.786], 15);
-    expect(elevation).toEqual(2316);
+  test('30.30905, -2.01723', async() => {
+    const elevation = await trgb.getElevation([30.30905, -2.01723], 15);
+    expect(elevation).toEqual(1586);
   });
 
-  test('29.831, -2.547', async() => {
-    const elevation = await trgb.getElevation([29.831, -2.547], 15);
-    expect(elevation).toEqual(1588);
+  test('29.46279, -2.12171', async() => {
+    const elevation = await trgb.getElevation([29.46279, -2.12171], 15);
+    expect(elevation).toEqual(1997);
   });
 
-  test('30.624, -2.048', async() => {
-    const elevation = await trgb.getElevation([30.624, -2.048], 15);
-    expect(elevation).toEqual(1625);
+  test('29.76760, -2.68676', async() => {
+    const elevation = await trgb.getElevation([29.76760, -2.68676], 15);
+    expect(elevation).toEqual(1710);
   });
 
-  test('30.615, -1.978', async() => {
-    const elevation = await trgb.getElevation([30.615, -1.978], 15);
-    expect(elevation).toEqual(1562);
+  test('30.78230, -2.25379', async() => {
+    const elevation = await trgb.getElevation([30.78230, -2.25379], 15);
+    expect(elevation).toEqual(1392);
   });
 })

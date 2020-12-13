@@ -19,3 +19,5 @@ console.log(elevation);
 ```
 
 If it can't find tile, it will return 404 error.
+
+If its terrain RGB tilesets was resampled by gdal2tiles, the result of elevation might not be the same with original DEM image.
