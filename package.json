@@ -9,6 +9,9 @@
     "dist",
     "es6"
   ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
   "scripts": {
     "test": "jest",
     "build": "npm run build:cjs && npm run build:esm",
