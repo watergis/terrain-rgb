@@ -7,7 +7,7 @@ This module is to get elevation from terrain RGB tilesets by longitude and latit
 ## Install
 
 ```
-npm i git+https://github.com/watergis/terrain-rgb.git
+npm i @water-gis/terrain-rgb
 ```
 
 ## Usage
