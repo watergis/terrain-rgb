@@ -18,7 +18,7 @@ const stubs = {
   fd_write () { throw new Error('Syscall fd_write not implemented') }
 }
 
-const code = fs.readFileSync(path.join(__dirname, 'webp.wasm'))
+const code = fs.readFileSync(path.join(__dirname, '../wasm/webp.wasm'))
 const wasmModule = new WebAssembly.Module(code)
 const instance = new WebAssembly.Instance(wasmModule, { wasi_snapshot_preview1: stubs })
 
