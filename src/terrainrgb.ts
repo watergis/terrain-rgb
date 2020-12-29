@@ -1,6 +1,9 @@
 import * as tilebelt from './tilebelt';
 import axios from 'axios';
 import PNG from 'png-ts';
+import {WebpMachine} from "webp-hero"
+import webp from '@cwasm/webp';
+import { Z_BINARY } from 'zlib';
 
 
 class TerrainRGB {
@@ -17,7 +20,7 @@ class TerrainRGB {
     this.tileSize = tileSize;
   }
 
-  getElevation(lnglat: number[], z: number): Promise<number>{
+  getElevation(lnglat: number[], z: number): Promise<number | undefined>{
     const tileSize = this.tileSize;
 
     return new Promise((resolve: (value?:number)=>void, reject: (reason?: any) => void) => {
@@ -33,32 +36,76 @@ class TerrainRGB {
         .replace(/{x}/g, tile[0].toString())
         .replace(/{y}/g, tile[1].toString())
         .replace(/{z}/g, tile[2].toString());
+      let ext = this.getUrlExtension(url);
+      // console.log(ext)
+      if (!ext){
+        ext = "png";
+      }
       axios.get(url, {
         responseType: 'arraybuffer'
       })
       .then(res => {
-        const pngImage = PNG.load(Buffer.from(res.data, 'binary'));
-        const pixels = pngImage.decodePixels();
-        const data = [];
-        for (let i=0; i < pixels.length; i=i+4){
-          const r = pixels[i];
-          const g = pixels[i+1];
-          const b = pixels[i+2];
-          const a = pixels[i+3];
-          const rgba = [r, g, b, a]
-          data.push(rgba);
+        let height = -1;
+        const binary = Buffer.from(res.data, 'binary')
+        switch(ext){
+          case 'png':
+            height = this.getElevationFromPNG(binary, tile, lng, lat, tileSize);
+            break;
+          case 'webp':
+            height = this.getElevationFromWEBP(binary, tile, lng, lat, tileSize);
+            break;
+          default:
+            break;
         }
-        const bbox = tilebelt.tileToBBOX(tile);
-        const pixPos = this.getPixelPosition(lng, lat, bbox);
-        const pos = pixPos[0] + pixPos[1] * tileSize
-        const rgba = data[pos]
-        // console.log(rgba)
-        const height = this.calcElevation(rgba[0], rgba[1], rgba[2]);
+        
         resolve(height);    
       })
       .catch(err=>reject(err))
     })
     
+  }
+
+  getElevationFromPNG(binary: Uint8Array, tile: number[], lng: number, lat: number, tileSize: number): number{
+    const pngImage = PNG.load(binary);
+    const pixels = pngImage.decodePixels();
+    const data = [];
+    for (let i=0; i < pixels.length; i=i+4){
+      const r = pixels[i];
+      const g = pixels[i+1];
+      const b = pixels[i+2];
+      const a = pixels[i+3];
+      const rgba = [r, g, b, a]
+      data.push(rgba);
+    }
+    const bbox = tilebelt.tileToBBOX(tile);
+    const pixPos = this.getPixelPosition(lng, lat, bbox);
+    const pos = pixPos[0] + pixPos[1] * tileSize
+    const rgba = data[pos]
+    // console.log(rgba)
+    const height = this.calcElevation(rgba[0], rgba[1], rgba[2]);
+    return height;
+  }
+
+  getElevationFromWEBP(binary: Uint8Array, tile: number[], lng: number, lat: number, tileSize: number): number{
+    const image = webp.decode(binary);
+    const pixels = image.data;
+    
+    const data = [];
+    for (let i=0; i < pixels.length; i=i+4){
+      const r = pixels[i];
+      const g = pixels[i+1];
+      const b = pixels[i+2];
+      const a = pixels[i+3];
+      const rgba = [r, g, b, a]
+      data.push(rgba);
+    }
+    const bbox = tilebelt.tileToBBOX(tile);
+    const pixPos = this.getPixelPosition(lng, lat, bbox);
+    const pos = pixPos[0] + pixPos[1] * tileSize
+    const rgba = data[pos]
+    // console.log(rgba)
+    const height = this.calcElevation(rgba[0], rgba[1], rgba[2]);
+    return height;
   }
 
   calcElevation(r: number, g: number, b: number): number{
@@ -77,6 +124,14 @@ class TerrainRGB {
     const xPx = Math.floor( pixelWidth * widthPct );
     const yPx = Math.floor( pixelHeight * ( 1 - heightPct ) );
     return [xPx, yPx];
+  }
+
+  getUrlExtension(url: string): string | undefined{
+    let extension = url.split(/[#?]/)[0].split('.').pop();
+    if (extension){
+      extension = extension.trim();
+    }
+    return extension;
   }
 
 }

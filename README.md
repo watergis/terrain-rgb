@@ -12,6 +12,8 @@ npm i @water-gis/terrain-rgb
 
 ## Usage
 
+This module can be used for PNG or WEBP terrain RGB tilesets.
+
 ```ts
 import {TerrainRGB} from '@water-gis/terrain-rgb';
 
