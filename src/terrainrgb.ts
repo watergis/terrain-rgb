@@ -1,9 +1,7 @@
 import * as tilebelt from './tilebelt';
 import axios from 'axios';
 import PNG from 'png-ts';
-import {WebpMachine} from "webp-hero"
 import webp from '@cwasm/webp';
-import { Z_BINARY } from 'zlib';
 
 
 class TerrainRGB {
