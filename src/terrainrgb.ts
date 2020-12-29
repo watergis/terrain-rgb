@@ -1,7 +1,7 @@
 import * as tilebelt from './tilebelt';
 import axios from 'axios';
 import PNG from 'png-ts';
-import webp from '@cwasm/webp';
+import { decode } from './webp';
 
 
 class TerrainRGB {
@@ -85,7 +85,7 @@ class TerrainRGB {
   }
 
   getElevationFromWEBP(binary: Uint8Array, tile: number[], lng: number, lat: number, tileSize: number): number{
-    const image = webp.decode(binary);
+    const image = decode(binary);
     const pixels = image.data;
     
     const data = [];

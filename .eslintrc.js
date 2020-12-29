@@ -20,5 +20,6 @@ module.exports = {
     'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],
   rules: {
+    "@typescript-eslint/ban-ts-comment": "off"
   },
 };
