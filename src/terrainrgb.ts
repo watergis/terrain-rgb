@@ -1,7 +1,7 @@
 import * as tilebelt from './tilebelt';
 import axios from 'axios';
 import PNG from 'png-ts';
-import { decode } from './webp';
+import {WebpMachine, loadBinaryData} from "webp-hero"
 
 
 class TerrainRGB {
@@ -39,26 +39,31 @@ class TerrainRGB {
       if (!ext){
         ext = "png";
       }
-      axios.get(url, {
-        responseType: 'arraybuffer'
-      })
-      .then(res => {
-        let height = -1;
-        const binary = Buffer.from(res.data, 'binary')
-        switch(ext){
-          case 'png':
-            height = this.getElevationFromPNG(binary, tile, lng, lat, tileSize);
-            break;
-          case 'webp':
-            height = this.getElevationFromWEBP(binary, tile, lng, lat, tileSize);
-            break;
-          default:
-            break;
-        }
-        
-        resolve(height);    
-      })
-      .catch(err=>reject(err))
+      switch(ext){
+        case 'png':
+          axios.get(url, {
+            responseType: 'arraybuffer'
+          })
+          .then(res => {
+            const binary = Buffer.from(res.data, 'binary')
+            const height = this.getElevationFromPNG(binary, tile, lng, lat, tileSize);
+            resolve(height);    
+          })
+          .catch(err=>reject(err))
+          break;
+        case 'webp':
+          loadBinaryData(url)
+          .then(binary=>{
+            this.getElevationFromWEBP(binary, tile, lng, lat, tileSize).then((height: number)=>{
+              resolve(height); 
+            }).catch(err=>reject(err));
+          }).catch(err=>reject(err))
+          break;
+        default:
+          reject(`Invalid file extension: ${ext}`);
+          break;
+      }
+      
     })
     
   }
@@ -66,49 +71,46 @@ class TerrainRGB {
   getElevationFromPNG(binary: Uint8Array, tile: number[], lng: number, lat: number, tileSize: number): number{
     const pngImage = PNG.load(binary);
     const pixels = pngImage.decodePixels();
-    const data = [];
-    for (let i=0; i < pixels.length; i=i+4){
-      const r = pixels[i];
-      const g = pixels[i+1];
-      const b = pixels[i+2];
-      const a = pixels[i+3];
-      const rgba = [r, g, b, a]
-      data.push(rgba);
-    }
-    const bbox = tilebelt.tileToBBOX(tile);
-    const pixPos = this.getPixelPosition(lng, lat, bbox);
-    const pos = pixPos[0] + pixPos[1] * tileSize
-    const rgba = data[pos]
+    const rgba = this.pixels2rgba(pixels, tile, lng, lat, tileSize);
     // console.log(rgba)
     const height = this.calcElevation(rgba[0], rgba[1], rgba[2]);
     return height;
   }
 
-  getElevationFromWEBP(binary: Uint8Array, tile: number[], lng: number, lat: number, tileSize: number): number{
-    const image = decode(binary);
-    const pixels = image.data;
+  getElevationFromWEBP(binary: Uint8Array, tile: number[], lng: number, lat: number, tileSize: number): Promise<number>{
+    return new Promise((resolve: (value:number)=>void, reject: (reason?: any) => void) => {
+      const webpMachine = new WebpMachine()
+      webpMachine.decode(binary).then((dataURI: string)=>{
+        const buffer = this.dataURIConverter(dataURI);
+        const height = this.getElevationFromPNG(buffer, tile, lng, lat, tileSize);
+        resolve(height)
+      })
+      .catch(err=>reject(err));
+      
+    })
     
-    const data = [];
-    for (let i=0; i < pixels.length; i=i+4){
-      const r = pixels[i];
-      const g = pixels[i+1];
-      const b = pixels[i+2];
-      const a = pixels[i+3];
-      const rgba = [r, g, b, a]
-      data.push(rgba);
-    }
-    const bbox = tilebelt.tileToBBOX(tile);
-    const pixPos = this.getPixelPosition(lng, lat, bbox);
-    const pos = pixPos[0] + pixPos[1] * tileSize
-    const rgba = data[pos]
-    // console.log(rgba)
-    const height = this.calcElevation(rgba[0], rgba[1], rgba[2]);
-    return height;
   }
 
   calcElevation(r: number, g: number, b: number): number{
     const elev = -10000 + ((r * 256 * 256 + g * 256 + b) * 0.1)
     return elev;
+  }
+
+  pixels2rgba(pixels: Uint8Array, tile: number[], lng: number, lat: number, tileSize: number): number[]{
+    const data = [];
+    for (let i=0; i < pixels.length; i=i+4){
+      const r = pixels[i];
+      const g = pixels[i+1];
+      const b = pixels[i+2];
+      const a = pixels[i+3];
+      const rgba = [r, g, b, a]
+      data.push(rgba);
+    }
+    const bbox = tilebelt.tileToBBOX(tile);
+    const pixPos = this.getPixelPosition(lng, lat, bbox);
+    const pos = pixPos[0] + pixPos[1] * tileSize
+    const rgba = data[pos]
+    return rgba;
   }
 
   getPixelPosition(lng: number, lat: number, bbox: number[]): number[]{
@@ -131,6 +133,15 @@ class TerrainRGB {
     }
     return extension;
   }
+
+  dataURIConverter(dataURI: string) : Uint8Array{
+    const byteString = atob(dataURI.split(',')[1]);
+    const buffer = new Uint8Array(byteString.length);
+    for (let i = 0; i < byteString.length; i++) {
+        buffer[i] = byteString.charCodeAt(i);
+    }
+    return buffer
+}
 
 }
 
