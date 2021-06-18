@@ -7,15 +7,19 @@ This module is to get elevation from terrain RGB tilesets by longitude and latit
 ## Install
 
 ```
-npm i @water-gis/terrain-rgb
+npm i @watergis/terrain-rgb
 ```
+
+## demo
+
+[code sandbox](https://codesandbox.io/s/terrain-rgb-g4nym)
 
 ## Usage
 
 This module can be used for PNG or WEBP terrain RGB tilesets.
 
 ```ts
-import {TerrainRGB} from '@water-gis/terrain-rgb';
+import {TerrainRGB} from '@watergis/terrain-rgb';
 
 const url = 'https://wasac.github.io/rw-terrain/tiles/{z}/{x}/{y}.png';
 const trgb = new TerrainRGB(url, 512);
