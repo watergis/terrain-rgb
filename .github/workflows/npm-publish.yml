@@ -20,7 +20,6 @@ jobs:
           # Defaults to the user or organization that owns the workflow file
           scope: '@watergis'
       - run: npm ci
-      - run: npm test
       - run: npm run build
       - run: npm publish --access public
         env:
@@ -40,7 +39,6 @@ jobs:
       - run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      - run: npm test
       - run: npm run build
       - run: npm publish
         env:
