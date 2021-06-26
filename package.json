@@ -17,10 +17,8 @@
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc --project . --module commonjs --outDir ./dist",
     "build:esm": "tsc --project . --module es2015 --outDir ./es6",
-    "check-types": "tsc --noEmit",
-    "eslint": "eslint src/**/*.ts",
-    "eslint:fix": "eslint src/**/*.ts --fix",
-    "lint": "npm run eslint && npm run check-types"
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint --fix src/**/*.ts"
   },
   "repository": {
     "type": "git",
@@ -39,6 +37,8 @@
     "@typescript-eslint/parser": "^4.26.0",
     "canvas": "^2.8.0",
     "eslint": "^7.27.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.23.4",
     "jest": "^26.1.0",
     "jest-canvas-mock": "^2.3.0",
     "ts-jest": "^26.5.6",
