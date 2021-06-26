@@ -1,6 +1,6 @@
-import {TerrainRGB} from '../src/index';
+import TerrainRGB from '../src/tile/terrainrgb';
 
-describe('PNG tilesets', (): void => {
+describe('Terrain RGB PNG tilesets', (): void => {
   const url = 'https://wasac.github.io/rw-terrain/tiles/{z}/{x}/{y}.png';
   const trgb = new TerrainRGB(url, 512)
 
@@ -30,7 +30,7 @@ describe('PNG tilesets', (): void => {
   });
 })
 
-describe('WEBP tilesets', (): void => {
+describe('Terrain RGB WEBP tilesets', (): void => {
   const url = 'https://wasac.github.io/rw-terrain-webp/tiles/{z}/{x}/{y}.webp';
   const trgb = new TerrainRGB(url, 512)
 
