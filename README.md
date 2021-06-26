@@ -1,4 +1,5 @@
 # terrain-rgb
+![](https://github.com/watergis/terrain-rgb/workflows/build/badge.svg)
 ![](https://github.com/watergis/terrain-rgb/workflows/Node.js%20Package/badge.svg)
 ![GitHub](https://img.shields.io/github/license/watergis/terrain-rgb)
 
