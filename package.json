@@ -17,6 +17,7 @@
     "build": "npm run build:cjs && npm run build:esm",
     "build:cjs": "tsc --project . --module commonjs --outDir ./dist",
     "build:esm": "tsc --project . --module es2015 --outDir ./es6",
+    "prepare": "npm run build",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint --fix src/**/*.ts"
   },
@@ -31,8 +32,9 @@
   },
   "homepage": "https://github.com/watergis/terrain-rgb#readme",
   "devDependencies": {
-    "@types/buffer-from": "^1.1.0",
+    "@types/get-pixels": "^3.3.2",
     "@types/jest": "^26.0.23",
+    "@types/mapbox__sphericalmercator": "^1.2.0",
     "@types/node": "^14.17.1",
     "@typescript-eslint/eslint-plugin": "^4.26.0",
     "@typescript-eslint/parser": "^4.26.0",
@@ -47,9 +49,9 @@
   },
   "dependencies": {
     "@canvas/image-data": "^1.0.0",
-    "axios": "^0.21.1",
-    "buffer-from": "^1.1.2",
+    "@mapbox/sphericalmercator": "^1.2.0",
     "fs": "0.0.1-security",
+    "get-pixels": "^3.3.3",
     "path": "^0.12.7",
     "png-ts": "0.0.3",
     "webp-hero": "0.0.0-dev.27"

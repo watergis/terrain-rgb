@@ -1,7 +1,7 @@
-import axios from 'axios';
 import PNG from 'png-ts';
 import { WebpMachine, loadBinaryData } from 'webp-hero';
-import bufferFrom from 'buffer-from';
+import SphericalMercator from '@mapbox/sphericalmercator';
+import getPixels from 'get-pixels';
 import * as tilebelt from '../tilebelt';
 
 /**
@@ -16,6 +16,8 @@ abstract class BaseTile {
 
   protected maxzoom: number;
 
+  protected merc: any;
+
   /**
    * Constructor
    * @param url URL for terrain RGB raster tilesets
@@ -28,6 +30,7 @@ abstract class BaseTile {
     this.tileSize = tileSize;
     this.minzoom = minzoom;
     this.maxzoom = maxzoom;
+    this.merc = new SphericalMercator({ size: this.tileSize });
   }
 
   /**
@@ -58,15 +61,17 @@ abstract class BaseTile {
       }
       switch (ext) {
         case 'png':
-          axios.get(url, {
-            responseType: 'arraybuffer',
-          })
-            .then((res) => {
-              const binary = bufferFrom(res.data, 'binary');
-              const value = this.getValueFromPNG(binary, tile, lng, lat);
-              resolve(value);
-            })
-            .catch((err) => reject(err));
+          // eslint-disable-next-line consistent-return
+          getPixels(url, (err, resp) => {
+            if (err) return reject(err);
+            const tilePx = this.merc.px(lnglat, zoom)
+              .map((coord: number) => Math.floor(coord % this.tileSize));
+            const stride = 4;
+            const pxIndex = stride * (tilePx[0] + tilePx[1] * this.tileSize);
+            const [r, g, b] = [resp.data[pxIndex], resp.data[pxIndex + 1], resp.data[pxIndex + 2]];
+            const value = this.calc(r, g, b);
+            resolve(value);
+          });
           break;
         case 'webp':
           loadBinaryData(url)
@@ -133,7 +138,7 @@ abstract class BaseTile {
    * @param b blue
    * @param a alfa
    */
-  protected abstract calc(r: number, g: number, b: number, a: number): number;
+  protected abstract calc(r: number, g: number, b: number, a?: number): number;
 
   /**
    * Get RGBA values from coordinates information
