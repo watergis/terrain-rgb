@@ -1,7 +1,7 @@
 import axios from 'axios';
 import PNG from 'png-ts';
 import { WebpMachine, loadBinaryData } from 'webp-hero';
-import bufferFrom from 'buffer-from';
+import { Buffer } from 'buffer';
 import * as tilebelt from '../tilebelt';
 
 /**
@@ -62,7 +62,7 @@ abstract class BaseTile {
             responseType: 'arraybuffer',
           })
             .then((res) => {
-              const binary = bufferFrom(res.data, 'binary');
+              const binary = Buffer.from(res.data, 'binary');
               const value = this.getValueFromPNG(binary, tile, lng, lat);
               resolve(value);
             })
