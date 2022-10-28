@@ -1,7 +1,7 @@
 import axios from 'axios';
-import PNG from 'png-ts';
 import { WebpMachine, loadBinaryData } from 'webp-hero';
 import { Buffer } from 'buffer';
+import PNG from '../png';
 import * as tilebelt from '../tilebelt';
 
 /**
