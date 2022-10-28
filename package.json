@@ -1,6 +1,6 @@
 {
   "name": "@watergis/terrain-rgb",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "This module is to get elevation from terrain RGB tilesets by longitude and latitude.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -49,6 +49,7 @@
   "dependencies": {
     "@canvas/image-data": "^1.0.0",
     "axios": "^0.21.1",
+    "buffer": "^6.0.3",
     "pako": "^2.0.4",
     "webp-hero": "0.0.0-dev.27"
   },
