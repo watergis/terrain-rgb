@@ -93,7 +93,7 @@ abstract class BaseTile {
    */
   private getValueFromPNG(binary: Uint8Array, tile: number[], lng: number, lat: number): number {
     const pngImage = PNG.load(binary);
-    const pixels = pngImage.decodePixels();
+    const pixels = pngImage.decode();
     const rgba = this.pixels2rgba(pixels, tile, lng, lat);
     // console.log(rgba)
     const height = this.calc(rgba[0], rgba[1], rgba[2], rgba[3]);
