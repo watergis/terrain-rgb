@@ -1,8 +1,7 @@
 import axios from 'axios';
 import { WebpMachine, loadBinaryData } from 'webp-hero';
-import { Buffer } from 'buffer';
+import { lngLatToGoogle } from 'global-mercator';
 import PNG from '../png';
-import * as tilebelt from '../tilebelt';
 
 /**
  * Abstract class for terrain RGB tiles
@@ -37,6 +36,7 @@ abstract class BaseTile {
    * @returns the value calculated by certain formula
    */
   protected getValue(lnglat: number[], z: number): Promise<number> {
+    // eslint-disable-next-line no-unused-vars
     return new Promise((resolve: (value:number)=>void, reject: (reason?: any) => void) => {
       const lng = lnglat[0];
       const lat = lnglat[1];
@@ -46,7 +46,7 @@ abstract class BaseTile {
       } else if (z < this.minzoom) {
         zoom = this.minzoom;
       }
-      const tile = tilebelt.pointToTile(lng, lat, zoom);
+      const tile = lngLatToGoogle([lng, lat], zoom);
       const url: string = this.url
         .replace(/{x}/g, tile[0].toString())
         .replace(/{y}/g, tile[1].toString())
@@ -114,6 +114,7 @@ abstract class BaseTile {
     lng: number,
     lat: number,
   ): Promise<number> {
+    // eslint-disable-next-line no-unused-vars
     return new Promise((resolve: (value:number)=>void, reject: (reason?: any) => void) => {
       const webpMachine = new WebpMachine();
       webpMachine.decode(binary).then((dataURI: string) => {
@@ -153,7 +154,7 @@ abstract class BaseTile {
       const rgba = [r, g, b, a];
       data.push(rgba);
     }
-    const bbox = tilebelt.tileToBBOX(tile);
+    const bbox = this.tileToBBOX(tile);
     const pixPos = this.getPixelPosition(lng, lat, bbox);
     const pos = pixPos[0] + pixPos[1] * this.tileSize;
     const rgba = data[pos];
@@ -205,6 +206,36 @@ abstract class BaseTile {
       buffer[i] = byteString.charCodeAt(i);
     }
     return buffer;
+  }
+
+  /**
+   * Get the bbox of a tile
+   *
+   * @name tileToBBOX
+   * @param {Array<number>} tile
+   * @returns {Array<number>} bbox
+   * @example
+   * var bbox = tileToBBOX([5, 10, 10])
+   * //=bbox
+   */
+  private tileToBBOX(tile: number[]): number[] {
+    const e = this.tile2lon(tile[0] + 1, tile[2]);
+    const w = this.tile2lon(tile[0], tile[2]);
+    const s = this.tile2lat(tile[1] + 1, tile[2]);
+    const n = this.tile2lat(tile[1], tile[2]);
+    return [w, s, e, n];
+  }
+
+  private tile2lon(x: number, z: number): number {
+    // eslint-disable-next-line no-restricted-properties, no-mixed-operators
+    return (x / Math.pow(2, z)) * 360 - 180;
+  }
+
+  private tile2lat(y: number, z: number): number {
+    const r2d = 180 / Math.PI;
+    // eslint-disable-next-line no-restricted-properties, no-mixed-operators
+    const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, z);
+    return r2d * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
   }
 }
 
