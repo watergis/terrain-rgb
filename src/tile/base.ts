@@ -3,7 +3,6 @@ import { WebpMachine, loadBinaryData } from 'webp-hero';
 import { lngLatToGoogle } from 'global-mercator';
 import { Buffer } from 'buffer';
 import PNG from '../png';
-// import * as tilebelt from '../tilebelt';
 
 /**
  * Abstract class for terrain RGB tiles
