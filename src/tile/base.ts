@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { WebpMachine, loadBinaryData } from 'webp-hero';
 import { lngLatToGoogle } from 'global-mercator';
-import { Buffer } from 'buffer';
 import PNG from '../png';
 
 /**
