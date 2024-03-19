@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { WebpMachine, loadBinaryData } from 'webp-hero';
-import { lngLatToGoogle } from 'global-mercator';
+import { lngLatToGoogle,lngLatToTile } from 'global-mercator';
 import PNG from '../png';
 
 /**
@@ -11,6 +11,8 @@ abstract class BaseTile {
 
   protected tileSize: number;
 
+  protected tms: boolean;
+
   protected minzoom: number;
 
   protected maxzoom: number;
@@ -19,12 +21,14 @@ abstract class BaseTile {
    * Constructor
    * @param url URL for terrain RGB raster tilesets
    * @param tileSize size of tile. 256 or 512
+   * @param tms whether it is Tile Map Service
    * @param minzoom minzoom for terrain RGB raster tilesets
    * @param maxzoom maxzoom for terrain RGB raster tilesets
    */
-  constructor(url: string, tileSize: number, minzoom: number, maxzoom: number) {
+  constructor(url: string, tileSize: number, tms: boolean, minzoom: number, maxzoom: number) {
     this.url = url;
     this.tileSize = tileSize;
+    this.tms = tms;
     this.minzoom = minzoom;
     this.maxzoom = maxzoom;
   }
@@ -46,11 +50,11 @@ abstract class BaseTile {
       } else if (z < this.minzoom) {
         zoom = this.minzoom;
       }
-      const tile = lngLatToGoogle([lng, lat], zoom);
+      const tile = this.tms?lngLatToTile([lng, lat], zoom):lngLatToGoogle([lng, lat], zoom);
       const url: string = this.url
-        .replace(/{x}/g, tile[0].toString())
-        .replace(/{y}/g, tile[1].toString())
-        .replace(/{z}/g, tile[2].toString());
+          .replace(/{x}/g, tile[0].toString())
+          .replace(/{y}/g, tile[1].toString())
+          .replace(/{z}/g, tile[2].toString());
       let ext = this.getUrlExtension(url);
       // console.log(ext)
       if (!ext) {
@@ -61,20 +65,20 @@ abstract class BaseTile {
           axios.get(url, {
             responseType: 'arraybuffer',
           })
-            .then((res) => {
-              const binary = Buffer.from(res.data, 'binary');
-              const value = this.getValueFromPNG(binary, tile, lng, lat);
-              resolve(value);
-            })
-            .catch((err) => reject(err));
+              .then((res) => {
+                const binary = Buffer.from(res.data, 'binary');
+                const value = this.getValueFromPNG(binary, tile, lng, lat);
+                resolve(value);
+              })
+              .catch((err) => reject(err));
           break;
         case 'webp':
           loadBinaryData(url)
-            .then((binary) => {
-              this.getValueFromWEBP(binary, tile, lng, lat).then((value: number) => {
-                resolve(value);
+              .then((binary) => {
+                this.getValueFromWEBP(binary, tile, lng, lat).then((value: number) => {
+                  resolve(value);
+                }).catch((err) => reject(err));
               }).catch((err) => reject(err));
-            }).catch((err) => reject(err));
           break;
         default:
           reject(new Error(`Invalid file extension: ${ext}`));
@@ -109,10 +113,10 @@ abstract class BaseTile {
    * @returns the value calculated from coordinates
    */
   private getValueFromWEBP(
-    binary: Uint8Array,
-    tile: number[],
-    lng: number,
-    lat: number,
+      binary: Uint8Array,
+      tile: number[],
+      lng: number,
+      lat: number,
   ): Promise<number> {
     // eslint-disable-next-line no-unused-vars
     return new Promise((resolve: (value:number)=>void, reject: (reason?: any) => void) => {
@@ -122,7 +126,7 @@ abstract class BaseTile {
         const height = this.getValueFromPNG(buffer, tile, lng, lat);
         resolve(height);
       })
-        .catch((err) => reject(err));
+          .catch((err) => reject(err));
     });
   }
 
