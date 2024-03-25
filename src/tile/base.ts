@@ -18,8 +18,6 @@ abstract class BaseTile {
 
   protected maxzoom: number;
 
-  protected tms: boolean;
-
   /**
    * Constructor
    * @param url URL for terrain RGB raster tilesets
