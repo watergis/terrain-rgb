@@ -29,10 +29,10 @@ const elevation = await trgb.getElevation([30.0529622, -1.9575129], 15);
 console.log(elevation);
 ```
 
-TMS(Tiled Map Service) tiles are also supported with
+TMS(Tile Map Service) tiles are also supported with
 
 ```ts
-const trgb = new TerrainRGB(url, 512, 5, 15, true)
+const trgb = new TerrainRGB(url, 512, 5, 15, true);
 ```
 
 
