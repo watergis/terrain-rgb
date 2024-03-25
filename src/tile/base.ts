@@ -57,9 +57,9 @@ abstract class BaseTile {
       }
       const tile = this.tms ? lngLatToTile([lng, lat], zoom) : lngLatToGoogle([lng, lat], zoom);
       const url: string = this.url
-          .replace(/{x}/g, tile[0].toString())
-          .replace(/{y}/g, tile[1].toString())
-          .replace(/{z}/g, tile[2].toString());
+        .replace(/{x}/g, tile[0].toString())
+        .replace(/{y}/g, tile[1].toString())
+        .replace(/{z}/g, tile[2].toString());
       let ext = this.getUrlExtension(url);
       // console.log(ext)
       if (!ext) {
@@ -70,20 +70,20 @@ abstract class BaseTile {
           axios.get(url, {
             responseType: 'arraybuffer',
           })
-              .then((res) => {
-                const binary = Buffer.from(res.data, 'binary');
-                const value = this.getValueFromPNG(binary, tile, lng, lat);
-                resolve(value);
-              })
-              .catch((err) => reject(err));
+            .then((res) => {
+              const binary = Buffer.from(res.data, 'binary');
+              const value = this.getValueFromPNG(binary, tile, lng, lat);
+              resolve(value);
+            })
+            .catch((err) => reject(err));
           break;
         case 'webp':
           loadBinaryData(url)
-              .then((binary) => {
-                this.getValueFromWEBP(binary, tile, lng, lat).then((value: number) => {
-                  resolve(value);
-                }).catch((err) => reject(err));
+            .then((binary) => {
+              this.getValueFromWEBP(binary, tile, lng, lat).then((value: number) => {
+                resolve(value);
               }).catch((err) => reject(err));
+            }).catch((err) => reject(err));
           break;
         default:
           reject(new Error(`Invalid file extension: ${ext}`));
@@ -118,10 +118,10 @@ abstract class BaseTile {
    * @returns the value calculated from coordinates
    */
   private getValueFromWEBP(
-      binary: Uint8Array,
-      tile: number[],
-      lng: number,
-      lat: number,
+    binary: Uint8Array,
+    tile: number[],
+    lng: number,
+    lat: number,
   ): Promise<number> {
     // eslint-disable-next-line no-unused-vars
     return new Promise((resolve: (value:number)=>void, reject: (reason?: any) => void) => {
