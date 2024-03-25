@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { WebpMachine, loadBinaryData } from 'webp-hero';
-import { lngLatToGoogle } from 'global-mercator';
+import { lngLatToGoogle, lngLatToTile } from 'global-mercator';
+
 import PNG from '../png';
 
 /**
@@ -11,6 +12,8 @@ abstract class BaseTile {
 
   protected tileSize: number;
 
+  protected tms: boolean;
+
   protected minzoom: number;
 
   protected maxzoom: number;
@@ -19,14 +22,18 @@ abstract class BaseTile {
    * Constructor
    * @param url URL for terrain RGB raster tilesets
    * @param tileSize size of tile. 256 or 512
+   * @param tms whether it is Tile Map Service
    * @param minzoom minzoom for terrain RGB raster tilesets
    * @param maxzoom maxzoom for terrain RGB raster tilesets
+   * @param tms whether it is Tile Map Service
    */
-  constructor(url: string, tileSize: number, minzoom: number, maxzoom: number) {
+  constructor(url: string, tileSize: number, minzoom: number, maxzoom: number, tms: boolean) {
     this.url = url;
     this.tileSize = tileSize;
+    this.tms = tms;
     this.minzoom = minzoom;
     this.maxzoom = maxzoom;
+    this.tms = tms;
   }
 
   /**
@@ -46,7 +53,7 @@ abstract class BaseTile {
       } else if (z < this.minzoom) {
         zoom = this.minzoom;
       }
-      const tile = lngLatToGoogle([lng, lat], zoom);
+      const tile = this.tms ? lngLatToTile([lng, lat], zoom) : lngLatToGoogle([lng, lat], zoom);
       const url: string = this.url
         .replace(/{x}/g, tile[0].toString())
         .replace(/{y}/g, tile[1].toString())

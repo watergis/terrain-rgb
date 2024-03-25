@@ -24,10 +24,19 @@ import {TerrainRGB} from '@watergis/terrain-rgb';
 
 const url = 'https://wasac.github.io/rw-terrain/tiles/{z}/{x}/{y}.png';
 const trgb = new TerrainRGB(url, 512);
+
 const elevation = await trgb.getElevation([30.0529622, -1.9575129], 15);
 console.log(elevation);
 ```
 
+TMS(Tile Map Service) tiles are also supported with
+
+```ts
+const trgb = new TerrainRGB(url, 512, 5, 15, true);
+```
+
+
 If it can't find tile, it will return 404 error.
 
 If its terrain RGB tilesets was resampled by gdal2tiles, the result of elevation might not be the same with original DEM image.
+

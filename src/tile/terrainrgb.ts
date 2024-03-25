@@ -8,11 +8,12 @@ class TerrainRGB extends BaseTile {
    * Constructor
    * @param url URL for terrain RGB raster tilesets
    * @param tileSize size of tile. 256 or 512
+   * @param tms whether it is Tile Map Service
    * @param minzoom minzoom for terrain RGB raster tilesets. default is 5
    * @param maxzoom maxzoom for terrain RGB raster tilesets. default is 15
    */
-  constructor(url: string, tileSize: number, minzoom = 5, maxzoom = 15) {
-    super(url, tileSize, minzoom, maxzoom);
+  constructor(url: string, tileSize: number, minzoom = 5, maxzoom = 15, tms = false) {
+    super(url, tileSize, minzoom, maxzoom, tms);
   }
 
   /**
