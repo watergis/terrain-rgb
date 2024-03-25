@@ -12,8 +12,8 @@ class TerrainRGB extends BaseTile {
    * @param minzoom minzoom for terrain RGB raster tilesets. default is 5
    * @param maxzoom maxzoom for terrain RGB raster tilesets. default is 15
    */
-  constructor(url: string, tileSize: number, tms:boolean = false, minzoom = 5, maxzoom = 15) {
-    super(url, tileSize, tms, minzoom, maxzoom);
+  constructor(url: string, tileSize: number, minzoom = 5, maxzoom = 15, tms = false) {
+    super(url, tileSize, minzoom, maxzoom, tms);
   }
 
   /**
