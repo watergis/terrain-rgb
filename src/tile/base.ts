@@ -131,7 +131,7 @@ abstract class BaseTile {
         const height = this.getValueFromPNG(buffer, tile, lng, lat);
         resolve(height);
       })
-          .catch((err) => reject(err));
+        .catch((err) => reject(err));
     });
   }
 
