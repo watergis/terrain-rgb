@@ -1,4 +1,4 @@
-import TerrainRGB from "../src/tile/terrainrgb";
+import { TerrainRGB } from "./terrainrgb";
 
 describe("Terrain RGB PNG tilesets", (): void => {
   const url = "https://wasac.github.io/rw-terrain/tiles/{z}/{x}/{y}.png";

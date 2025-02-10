@@ -1,13 +1,11 @@
-import axios from "axios";
-import { WebpMachine, loadBinaryData } from "webp-hero";
 import { lngLatToGoogle, lngLatToTile } from "global-mercator";
-
+import webp from "webp-wasm";
 import PNG from "../png";
 
 /**
  * Abstract class for terrain RGB tiles
  */
-abstract class BaseTile {
+export abstract class BaseTile {
   protected url: string;
 
   protected tileSize: number;
@@ -72,27 +70,20 @@ abstract class BaseTile {
       }
       switch (ext) {
         case "png":
-          axios
-            .get(url, {
-              responseType: "arraybuffer",
-            })
+          fetch(url)
+            .then((res) => res.arrayBuffer())
             .then((res) => {
-              const binary = Buffer.from(res.data, "binary");
-              const value = this.getValueFromPNG(binary, tile, lng, lat);
+              const buffer = new Uint8Array(res);
+              // const binary = Buffer.from(res.data, "binary");
+              const value = this.getValueFromPNG(buffer, tile, lng, lat);
               resolve(value);
             })
             .catch((err) => reject(err));
           break;
         case "webp":
-          loadBinaryData(url)
-            .then((binary) => {
-              this.getValueFromWEBP(binary, tile, lng, lat)
-                .then((value: number) => {
-                  resolve(value);
-                })
-                .catch((err) => reject(err));
-            })
-            .catch((err) => reject(err));
+          this.getValueFromWebp(url, tile, lng, lat).then((height) => {
+            resolve(height);
+          });
           break;
         default:
           reject(new Error(`Invalid file extension: ${ext}`));
@@ -123,31 +114,29 @@ abstract class BaseTile {
     return height;
   }
 
-  /**
-   * Get the value calculated from coordinates on WEBP raster tileset
-   * @param binary Image binary data
-   * @param tile tile index info
-   * @param lng longitude
-   * @param lat latitude
-   * @returns the value calculated from coordinates
-   */
-  private getValueFromWEBP(
-    binary: Uint8Array,
+  private async getValueFromWebp(
+    url: string,
     tile: number[],
     lng: number,
     lat: number,
   ): Promise<number> {
-    return new Promise((resolve: (value: number) => void, reject) => {
-      const webpMachine = new WebpMachine();
-      webpMachine
-        .decode(binary)
-        .then((dataURI: string) => {
-          const buffer = this.dataURIConverter(dataURI);
-          const height = this.getValueFromPNG(buffer, tile, lng, lat);
-          resolve(height);
-        })
-        .catch((err) => reject(err));
-    });
+    await webp.load();
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch tile: ${res.statusText}`);
+    }
+    const arrayBuffer = await res.arrayBuffer();
+
+    const imgData = await webp.decode(arrayBuffer);
+    const rgba = this.pixels2rgba(
+      imgData.data as unknown as Uint8Array<ArrayBuffer>,
+      tile,
+      lng,
+      lat,
+    );
+    const value = this.calc(rgba[0], rgba[1], rgba[2], rgba[3]);
+    return value;
   }
 
   /**
@@ -265,5 +254,3 @@ abstract class BaseTile {
     return r2d * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
   }
 }
-
-export default BaseTile;

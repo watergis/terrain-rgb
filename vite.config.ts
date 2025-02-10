@@ -9,7 +9,7 @@ export default defineConfig({
     assetsDir: "assets",
     sourcemap: true,
     lib: {
-      entry: resolve(__dirname, "src/index.ts"),
+      entry: resolve(__dirname, "src/lib/index.ts"),
       name: "terrainrgb",
       fileName: (format) => `terrain-rgb.${format}.js`,
       formats: ["es", "umd", "cjs"],

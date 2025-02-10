@@ -1,9 +1,9 @@
-import BaseTile from "./base";
+import { BaseTile } from "./base";
 
 /**
  * Terrain RGB class implementation
  */
-class TerrainRGB extends BaseTile {
+export class TerrainRGB extends BaseTile {
   /**
    * Constructor
    * @param url URL for terrain RGB raster tilesets
@@ -45,5 +45,3 @@ class TerrainRGB extends BaseTile {
     return elev;
   }
 }
-
-export default TerrainRGB;
