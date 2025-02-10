@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "description": "This module is to get elevation from terrain RGB tilesets by longitude and latitude.",
   "type": "module",
-  "main": "dist/terrain-rgb.umd.js",
+  "main": "dist/terrain-rgb.es.js",
   "types": "dist/types/index.d.ts",
   "module": "dist/terrain-rgb.es.js",
   "exports": {
@@ -48,7 +48,9 @@
     "canvas": "^3.1.0",
     "eslint": "^9.20.0",
     "eslint-config-prettier": "^10.0.1",
+    "global-mercator": "^3.1.0",
     "jsdom": "^26.0.0",
+    "pako": "^2.1.0",
     "prettier": "^3.5.0",
     "publint": "^0.3.4",
     "ts-jest": "^29.2.5",
@@ -58,8 +60,6 @@
     "vitest": "^3.0.5"
   },
   "dependencies": {
-    "global-mercator": "^3.1.0",
-    "pako": "^2.1.0",
     "webp-wasm": "^1.0.6"
   }
 }

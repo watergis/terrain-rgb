@@ -12,15 +12,10 @@ export default defineConfig({
       entry: resolve(__dirname, "src/lib/index.ts"),
       name: "terrainrgb",
       fileName: (format) => `terrain-rgb.${format}.js`,
-      formats: ["es", "umd", "cjs"],
+      formats: ["es", "cjs"],
     },
     rollupOptions: {
-      // external: ['maplibre-gl'],
-      // output: {
-      // 	globals: {
-      // 		'maplibre-gl': 'maplibregl'
-      // 	}
-      // }
+      external: ["webp-wasm"],
     },
   },
   plugins: [],
