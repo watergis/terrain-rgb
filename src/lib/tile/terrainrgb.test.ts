@@ -1,3 +1,4 @@
+import { test, expect, describe } from "vitest";
 import { TerrainRGB } from "./terrainrgb";
 
 describe("Terrain RGB PNG tilesets", (): void => {
