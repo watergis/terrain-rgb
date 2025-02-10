@@ -1,9 +1,9 @@
-import BaseTile from './base';
+import { BaseTile } from "./base";
 
 /**
  * Terrain RGB class implementation
  */
-class TerrainRGB extends BaseTile {
+export class TerrainRGB extends BaseTile {
   /**
    * Constructor
    * @param url URL for terrain RGB raster tilesets
@@ -12,7 +12,13 @@ class TerrainRGB extends BaseTile {
    * @param minzoom minzoom for terrain RGB raster tilesets. default is 5
    * @param maxzoom maxzoom for terrain RGB raster tilesets. default is 15
    */
-  constructor(url: string, tileSize: number, minzoom = 5, maxzoom = 15, tms = false) {
+  constructor(
+    url: string,
+    tileSize: number,
+    minzoom = 5,
+    maxzoom = 15,
+    tms = false,
+  ) {
     super(url, tileSize, minzoom, maxzoom, tms);
   }
 
@@ -35,9 +41,7 @@ class TerrainRGB extends BaseTile {
    * @returns an elevation calculated
    */
   protected calc(r: number, g: number, b: number): number {
-    const elev = -10000 + ((r * 256 * 256 + g * 256 + b) * 0.1);
+    const elev = -10000 + (r * 256 * 256 + g * 256 + b) * 0.1;
     return elev;
   }
 }
-
-export default TerrainRGB;

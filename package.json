@@ -2,23 +2,32 @@
   "name": "@watergis/terrain-rgb",
   "version": "1.2.0",
   "description": "This module is to get elevation from terrain RGB tilesets by longitude and latitude.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "module": "es6/index.js",
+  "type": "module",
+  "main": "dist/terrain-rgb.umd.js",
+  "types": "dist/types/index.d.ts",
+  "module": "dist/terrain-rgb.es.js",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/terrain-rgb.es.js",
+      "require": "./dist/terrain-rgb.cjs.js"
+    }
+  },
   "files": [
     "dist",
-    "es6"
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*"
   ],
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   },
   "scripts": {
-    "test": "jest",
-    "build": "npm run build:cjs && npm run build:esm",
+    "build": "tsc && vite build",
     "build:cjs": "tsc --project . --module commonjs --outDir ./dist",
     "build:esm": "tsc --project . --module es2015 --outDir ./es6",
-    "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint --fix src/**/*.ts"
+    "lint": "prettier --check . && eslint .",
+    "format": "prettier --write .",
+    "test": "vitest --run --passWithNoTests"
   },
   "repository": {
     "type": "git",
@@ -31,46 +40,26 @@
   },
   "homepage": "https://github.com/watergis/terrain-rgb#readme",
   "devDependencies": {
-    "@types/buffer-from": "^1.1.0",
-    "@types/jest": "^26.0.23",
-    "@types/node": "^14.17.1",
-    "@types/pako": "^2.0.0",
-    "@typescript-eslint/eslint-plugin": "^4.26.0",
-    "@typescript-eslint/parser": "^4.26.0",
-    "canvas": "^2.8.0",
-    "eslint": "^7.27.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.23.4",
-    "jest": "^26.1.0",
-    "jest-canvas-mock": "^2.3.0",
-    "ts-jest": "^26.5.6",
-    "typescript": "^4.2.4"
+    "@types/buffer-from": "^1.1.3",
+    "@types/node": "^22.13.1",
+    "@types/pako": "^2.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.23.0",
+    "@typescript-eslint/parser": "^8.23.0",
+    "canvas": "^3.1.0",
+    "eslint": "^9.20.0",
+    "eslint-config-prettier": "^10.0.1",
+    "jsdom": "^26.0.0",
+    "prettier": "^3.5.0",
+    "publint": "^0.3.4",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.23.0",
+    "vite": "^6.1.0",
+    "vitest": "^3.0.5"
   },
   "dependencies": {
-    "@canvas/image-data": "^1.0.0",
-    "axios": "^0.21.1",
     "global-mercator": "^3.1.0",
-    "pako": "^2.0.4",
-    "webp-hero": "0.0.0-dev.27"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "transform": {
-      "^.+\\.ts$": "ts-jest"
-    },
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "tsconfig.json"
-      }
-    },
-    "testMatch": [
-      "**/tests/**/*.test.ts"
-    ],
-    "moduleNameMapper": {
-      "^#/(.+)": "<rootDir>/src/$1"
-    }
+    "pako": "^2.1.0",
+    "webp-wasm": "^1.0.6"
   }
 }

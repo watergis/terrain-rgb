@@ -1,13 +1,11 @@
-import axios from 'axios';
-import { WebpMachine, loadBinaryData } from 'webp-hero';
-import { lngLatToGoogle, lngLatToTile } from 'global-mercator';
-
-import PNG from '../png';
+import { lngLatToGoogle, lngLatToTile } from "global-mercator";
+import webp from "webp-wasm";
+import PNG from "../png";
 
 /**
  * Abstract class for terrain RGB tiles
  */
-abstract class BaseTile {
+export abstract class BaseTile {
   protected url: string;
 
   protected tileSize: number;
@@ -27,7 +25,13 @@ abstract class BaseTile {
    * @param maxzoom maxzoom for terrain RGB raster tilesets
    * @param tms whether it is Tile Map Service
    */
-  constructor(url: string, tileSize: number, minzoom: number, maxzoom: number, tms: boolean) {
+  constructor(
+    url: string,
+    tileSize: number,
+    minzoom: number,
+    maxzoom: number,
+    tms: boolean,
+  ) {
     this.url = url;
     this.tileSize = tileSize;
     this.tms = tms;
@@ -43,8 +47,7 @@ abstract class BaseTile {
    * @returns the value calculated by certain formula
    */
   protected getValue(lnglat: number[], z: number): Promise<number> {
-    // eslint-disable-next-line no-unused-vars
-    return new Promise((resolve: (value:number)=>void, reject: (reason?: any) => void) => {
+    return new Promise((resolve: (value: number) => void, reject) => {
       const lng = lnglat[0];
       const lat = lnglat[1];
       let zoom = z;
@@ -53,7 +56,9 @@ abstract class BaseTile {
       } else if (z < this.minzoom) {
         zoom = this.minzoom;
       }
-      const tile = this.tms ? lngLatToTile([lng, lat], zoom) : lngLatToGoogle([lng, lat], zoom);
+      const tile = this.tms
+        ? lngLatToTile([lng, lat], zoom)
+        : lngLatToGoogle([lng, lat], zoom);
       const url: string = this.url
         .replace(/{x}/g, tile[0].toString())
         .replace(/{y}/g, tile[1].toString())
@@ -61,27 +66,24 @@ abstract class BaseTile {
       let ext = this.getUrlExtension(url);
       // console.log(ext)
       if (!ext) {
-        ext = 'png';
+        ext = "png";
       }
       switch (ext) {
-        case 'png':
-          axios.get(url, {
-            responseType: 'arraybuffer',
-          })
+        case "png":
+          fetch(url)
+            .then((res) => res.arrayBuffer())
             .then((res) => {
-              const binary = Buffer.from(res.data, 'binary');
-              const value = this.getValueFromPNG(binary, tile, lng, lat);
+              const buffer = new Uint8Array(res);
+              // const binary = Buffer.from(res.data, "binary");
+              const value = this.getValueFromPNG(buffer, tile, lng, lat);
               resolve(value);
             })
             .catch((err) => reject(err));
           break;
-        case 'webp':
-          loadBinaryData(url)
-            .then((binary) => {
-              this.getValueFromWEBP(binary, tile, lng, lat).then((value: number) => {
-                resolve(value);
-              }).catch((err) => reject(err));
-            }).catch((err) => reject(err));
+        case "webp":
+          this.getValueFromWebp(url, tile, lng, lat).then((height) => {
+            resolve(height);
+          });
           break;
         default:
           reject(new Error(`Invalid file extension: ${ext}`));
@@ -98,7 +100,12 @@ abstract class BaseTile {
    * @param lat latitude
    * @returns the value calculated from coordinates
    */
-  private getValueFromPNG(binary: Uint8Array, tile: number[], lng: number, lat: number): number {
+  private getValueFromPNG(
+    binary: Uint8Array,
+    tile: number[],
+    lng: number,
+    lat: number,
+  ): number {
     const pngImage = PNG.load(binary);
     const pixels = pngImage.decode();
     const rgba = this.pixels2rgba(pixels, tile, lng, lat);
@@ -107,30 +114,29 @@ abstract class BaseTile {
     return height;
   }
 
-  /**
-   * Get the value calculated from coordinates on WEBP raster tileset
-   * @param binary Image binary data
-   * @param tile tile index info
-   * @param lng longitude
-   * @param lat latitude
-   * @returns the value calculated from coordinates
-   */
-  private getValueFromWEBP(
-    binary: Uint8Array,
+  private async getValueFromWebp(
+    url: string,
     tile: number[],
     lng: number,
     lat: number,
   ): Promise<number> {
-    // eslint-disable-next-line no-unused-vars
-    return new Promise((resolve: (value:number)=>void, reject: (reason?: any) => void) => {
-      const webpMachine = new WebpMachine();
-      webpMachine.decode(binary).then((dataURI: string) => {
-        const buffer = this.dataURIConverter(dataURI);
-        const height = this.getValueFromPNG(buffer, tile, lng, lat);
-        resolve(height);
-      })
-        .catch((err) => reject(err));
-    });
+    await webp.load();
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to fetch tile: ${res.statusText}`);
+    }
+    const arrayBuffer = await res.arrayBuffer();
+
+    const imgData = await webp.decode(arrayBuffer);
+    const rgba = this.pixels2rgba(
+      imgData.data as unknown as Uint8Array<ArrayBuffer>,
+      tile,
+      lng,
+      lat,
+    );
+    const value = this.calc(rgba[0], rgba[1], rgba[2], rgba[3]);
+    return value;
   }
 
   /**
@@ -151,7 +157,12 @@ abstract class BaseTile {
    * @param lat latitude
    * @returns RGBA values
    */
-  private pixels2rgba(pixels: Uint8Array, tile: number[], lng: number, lat: number): number[] {
+  private pixels2rgba(
+    pixels: Uint8Array,
+    tile: number[],
+    lng: number,
+    lat: number,
+  ): number[] {
     const data = [];
     for (let i = 0; i < pixels.length; i += 4) {
       const r = pixels[i];
@@ -194,7 +205,7 @@ abstract class BaseTile {
    * @returns file extenstion either png or webp
    */
   private getUrlExtension(url: string): string | undefined {
-    let extension = url.split(/[#?]/)[0].split('.').pop();
+    let extension = url.split(/[#?]/)[0].split(".").pop();
     if (extension) {
       extension = extension.trim();
     }
@@ -206,8 +217,8 @@ abstract class BaseTile {
    * @param dataURI Image URI
    * @returns buffer from the image
    */
-  private dataURIConverter(dataURI: string) : Uint8Array {
-    const byteString = atob(dataURI.split(',')[1]);
+  private dataURIConverter(dataURI: string): Uint8Array {
+    const byteString = atob(dataURI.split(",")[1]);
     const buffer = new Uint8Array(byteString.length);
     for (let i = 0; i < byteString.length; i += 1) {
       buffer[i] = byteString.charCodeAt(i);
@@ -234,16 +245,12 @@ abstract class BaseTile {
   }
 
   private tile2lon(x: number, z: number): number {
-    // eslint-disable-next-line no-restricted-properties, no-mixed-operators
     return (x / Math.pow(2, z)) * 360 - 180;
   }
 
   private tile2lat(y: number, z: number): number {
     const r2d = 180 / Math.PI;
-    // eslint-disable-next-line no-restricted-properties, no-mixed-operators
     const n = Math.PI - (2 * Math.PI * y) / Math.pow(2, z);
     return r2d * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)));
   }
 }
-
-export default BaseTile;
