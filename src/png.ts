@@ -5,9 +5,9 @@
  * Work from https://github.com/Hopding/png-ts
  */
 
-import pako from 'pako';
+import pako from "pako";
 
-export type ColorSpace = 'DeviceGray' | 'DeviceRGB';
+export type ColorSpace = "DeviceGray" | "DeviceRGB";
 
 export default class PNG {
   static load = (data: Uint8Array) => new PNG(data);
@@ -47,13 +47,13 @@ export default class PNG {
     while (true) {
       const chunkSize = this.readUInt32();
 
-      let section = '';
+      let section = "";
       for (let i = 0; i < 4; i++) {
         section += String.fromCharCode(this.data[this.pos++]);
       }
 
       switch (section) {
-        case 'IHDR': {
+        case "IHDR": {
           // We can grab interesting values from here (like width, height, etc...)
           this.width = this.readUInt32();
           this.height = this.readUInt32();
@@ -65,19 +65,19 @@ export default class PNG {
           break;
         }
 
-        case 'PLTE': {
+        case "PLTE": {
           this.palette = this.read(chunkSize);
           break;
         }
 
-        case 'IDAT': {
+        case "IDAT": {
           for (let i = 0; i < chunkSize; i++) {
             imgDataBuff.push(this.data[this.pos++]);
           }
           break;
         }
 
-        case 'tRNS': {
+        case "tRNS": {
           // This chunk can only occur once and it must occur after the
           // PLTE chunk and before the IDAT chunk.
           this.transparency = {};
@@ -111,7 +111,7 @@ export default class PNG {
           break;
         }
 
-        case 'tEXt': {
+        case "tEXt": {
           const text = this.read(chunkSize);
           const index = text.indexOf(0);
           const key = String.fromCharCode(...text.slice(0, index));
@@ -119,7 +119,7 @@ export default class PNG {
           break;
         }
 
-        case 'IEND': {
+        case "IEND": {
           // We've got everything we need!
           const colorTypeMap: { [colorType: number]: 1 | 3 } = {
             0: 1,
@@ -134,8 +134,8 @@ export default class PNG {
           const colors = this.colors + (this.hasAlphaChannel ? 1 : 0);
           this.pixelBitlength = this.bits * colors;
           this.colorSpace = {
-            1: 'DeviceGray',
-            3: 'DeviceRGB',
+            1: "DeviceGray",
+            3: "DeviceRGB",
           }[this.colors] as ColorSpace;
           this.imgData = new Uint8Array(imgDataBuff);
 
@@ -150,7 +150,7 @@ export default class PNG {
 
       this.pos += 4; // Skip the CRC
       if (this.pos > this.data.length) {
-        throw new Error('Incomplete or corrupt PNG file');
+        throw new Error("Incomplete or corrupt PNG file");
       }
     }
   }

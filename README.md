@@ -1,4 +1,5 @@
 # terrain-rgb
+
 ![](https://github.com/watergis/terrain-rgb/workflows/build/badge.svg)
 ![](https://github.com/watergis/terrain-rgb/workflows/Node.js%20Package/badge.svg)
 ![GitHub](https://img.shields.io/github/license/watergis/terrain-rgb)
@@ -20,9 +21,9 @@ npm i @watergis/terrain-rgb
 This module can be used for PNG or WEBP terrain RGB tilesets.
 
 ```ts
-import {TerrainRGB} from '@watergis/terrain-rgb';
+import { TerrainRGB } from "@watergis/terrain-rgb";
 
-const url = 'https://wasac.github.io/rw-terrain/tiles/{z}/{x}/{y}.png';
+const url = "https://wasac.github.io/rw-terrain/tiles/{z}/{x}/{y}.png";
 const trgb = new TerrainRGB(url, 512);
 
 const elevation = await trgb.getElevation([30.0529622, -1.9575129], 15);
@@ -35,8 +36,6 @@ TMS(Tile Map Service) tiles are also supported with
 const trgb = new TerrainRGB(url, 512, 5, 15, true);
 ```
 
-
 If it can't find tile, it will return 404 error.
 
 If its terrain RGB tilesets was resampled by gdal2tiles, the result of elevation might not be the same with original DEM image.
-

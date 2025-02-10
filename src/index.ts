@@ -1,1 +1,1 @@
-export { default as TerrainRGB } from './tile/terrainrgb'
+export { default as TerrainRGB } from "./tile/terrainrgb";
