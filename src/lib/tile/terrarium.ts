@@ -1,12 +1,12 @@
 import { BaseTile } from "./base";
 
 /**
- * Terrain RGB class implementation
+ * Terrarium class implementation
  */
 export class Terrarium extends BaseTile {
   /**
    * Constructor
-   * @param url URL for terrain RGB raster tilesets
+   * @param url URL for terrarium raster tilesets
    * @param tileSize size of tile. 256 or 512
    * @param tms whether it is Tile Map Service
    * @param minzoom minzoom for terrain RGB raster tilesets. default is 5

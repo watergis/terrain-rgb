@@ -1,8 +1,9 @@
 # terrain-rgb
 
+![License](https://img.shields.io/github/license/watergis/terrain-rgb)
+[![version](https://img.shields.io/npm/v/@watergis/terrain-rgb.svg)](https://www.npmjs.com/package/@watergis/terrain-rgb)
 ![](https://github.com/watergis/terrain-rgb/workflows/build/badge.svg)
 ![](https://github.com/watergis/terrain-rgb/workflows/Node.js%20Package/badge.svg)
-![GitHub](https://img.shields.io/github/license/watergis/terrain-rgb)
 
 This module is to get elevation from terrain RGB tilesets by longitude and latitude.
 

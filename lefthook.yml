@@ -7,6 +7,8 @@ pre-commit:
   commands:
     lint:
       run: pnpm lint
+    typedoc:
+      run: pnpm typedoc
 
 pre-push:
   parallel: true

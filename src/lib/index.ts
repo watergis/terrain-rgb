@@ -1,2 +1,1 @@
-export * from "./tile/terrainrgb";
-export * from "./tile/terrarium";
+export * from "./tile";

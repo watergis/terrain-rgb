@@ -227,8 +227,6 @@ export abstract class BaseTile {
 
   /**
    * Get the bbox of a tile
-   *
-   * @name tileToBBOX
    * @param {Array<number>} tile
    * @returns {Array<number>} bbox
    * @example
