@@ -1,5 +1,11 @@
 # @watergis/terrain-rgb
 
+## 2.1.0
+
+### Minor Changes
+
+- 109d0ed: feat: add support of terrarium encoding.
+
 ## 2.0.2
 
 ### Patch Changes
