@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TerrainRGB Test</title>
+    <script type="module">
+      import { TerrainRGB } from "./src/lib";
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const testCases = [
+          { lat: 30.48535, lng: -2.03089, zoom: 15, expected: 1347 },
+          { lat: 30.30905, lng: -2.01723, zoom: 15, expected: 1586 },
+          { lat: 29.46279, lng: -2.12171, zoom: 15, expected: 1997 },
+          { lat: 29.7676, lng: -2.68676, zoom: 15, expected: 1710 },
+          { lat: 30.7823, lng: -2.25379, zoom: 15, expected: 1392 },
+        ];
+
+        const pngUrl =
+          "https://wasac.github.io/rw-terrain/tiles/{z}/{x}/{y}.png";
+        const webpUrl =
+          "https://wasac.github.io/rw-terrain-webp/tiles/{z}/{x}/{y}.webp";
+
+        document.getElementById("png-url").textContent = pngUrl;
+        document.getElementById("webp-url").textContent = webpUrl;
+
+        const pngTerrain = new TerrainRGB(pngUrl, 512);
+        const webpTerrain = new TerrainRGB(webpUrl, 512);
+
+        async function runTest(testCase, terrain, type) {
+          const elevation = await terrain.getElevation(
+            [testCase.lat, testCase.lng],
+            testCase.zoom,
+          );
+          const isCorrect = elevation === testCase.expected;
+          return `<tr>
+                            <td>${type}</td>
+                            <td>${testCase.lat}, ${testCase.lng}</td>
+                            <td>${testCase.zoom}</td>
+                            <td>${elevation}</td>
+                            <td>${testCase.expected}</td>
+                            <td data-testid="result" style="background: ${isCorrect ? "green" : "red"}; color: white;">
+                                ${isCorrect ? "✔" : "✘"}
+                            </td>
+                        </tr>`;
+        }
+
+        const resultsTable = document.getElementById("results");
+        let resultsHTML = "";
+        for (const testCase of testCases) {
+          resultsHTML += await runTest(testCase, pngTerrain, "PNG");
+          resultsHTML += await runTest(testCase, webpTerrain, "WEBP");
+        }
+        resultsTable.innerHTML = resultsHTML;
+      });
+    </script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      table {
+        width: 80%;
+        margin: 20px auto;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid #ddd;
+      }
+      th {
+        background: #333;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>TerrainRGB Test Results</h1>
+    <p><strong>PNG URL:</strong> <span id="png-url"></span></p>
+    <p><strong>WEBP URL:</strong> <span id="webp-url"></span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Coordinates</th>
+          <th>Zoom</th>
+          <th>Calculated Elevation</th>
+          <th>Expected Elevation</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody id="results"></tbody>
+    </table>
+  </body>
+</html>

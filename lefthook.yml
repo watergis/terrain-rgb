@@ -1,0 +1,19 @@
+# EXAMPLE USAGE
+# Refer for explanation to following link:
+# https://github.com/evilmartians/lefthook/blob/master/docs/full_guide.md
+
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      run: pnpm lint
+
+pre-push:
+  parallel: true
+  commands:
+    build:
+      run: pnpm build
+    test:
+      run: |
+        pnpm exec playwright install
+        pnpm test
