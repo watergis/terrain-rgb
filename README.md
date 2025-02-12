@@ -39,3 +39,11 @@ const trgb = new TerrainRGB(url, 512, 5, 15, true);
 If it can't find tile, it will return 404 error.
 
 If its terrain RGB tilesets was resampled by gdal2tiles, the result of elevation might not be the same with original DEM image.
+
+If you want to use `terrarium` DEM, use `Terrarium` class as follows.
+
+```ts
+import { Terrarium } from "@watergis/terrain-rgb";
+```
+
+both `png` and `webp` formats are supported by the library.
