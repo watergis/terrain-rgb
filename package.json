@@ -26,6 +26,7 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "release": "changeset publish",
+    "typedoc": "typedoc --entryPointStrategy Expand src/lib --out docs",
     "test": "playwright test"
   },
   "repository": {
@@ -56,6 +57,7 @@
     "pako": "^2.1.0",
     "prettier": "^3.5.0",
     "publint": "^0.3.4",
+    "typedoc": "^0.27.7",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.23.0",
     "vite": "^6.1.0"
