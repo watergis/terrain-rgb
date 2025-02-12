@@ -12,7 +12,7 @@ export default defineConfig({
       entry: resolve(__dirname, "src/lib/index.ts"),
       name: "terrainrgb",
       fileName: (format) => `terrain-rgb.${format}.js`,
-      formats: ["es", "cjs"],
+      formats: ["es", "umd"],
     },
   },
   plugins: [],

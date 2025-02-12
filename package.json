@@ -3,14 +3,14 @@
   "version": "2.0.1",
   "description": "This module is to get elevation from terrain RGB tilesets by longitude and latitude.",
   "type": "module",
-  "main": "dist/terrain-rgb.es.js",
+  "main": "dist/terrain-rgb.umd.js",
   "types": "dist/types/index.d.ts",
   "module": "dist/terrain-rgb.es.js",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/terrain-rgb.es.js",
-      "require": "./dist/terrain-rgb.cjs.js"
+      "require": "./dist/terrain-rgb.umd.js"
     }
   },
   "files": [
