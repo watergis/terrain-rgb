@@ -115,7 +115,6 @@ export abstract class BaseTile {
     lng: number,
     lat: number,
   ): Promise<number> {
-
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Failed to fetch tile: ${res.statusText}`);
     const blob = await res.blob();
@@ -132,7 +131,7 @@ export abstract class BaseTile {
         const rgba = this.pixels2rgba(new Uint8Array(pixels), tile, lng, lat);
         // console.log(rgba)
         const height = this.calc(rgba[0], rgba[1], rgba[2], rgba[3]);
-        resolve(height)
+        resolve(height);
       };
       img.onerror = () => reject(new Error("Failed to load WebP image"));
       img.src = URL.createObjectURL(blob);
