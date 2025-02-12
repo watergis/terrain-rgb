@@ -14,9 +14,6 @@ export default defineConfig({
       fileName: (format) => `terrain-rgb.${format}.js`,
       formats: ["es", "cjs"],
     },
-    rollupOptions: {
-      external: ["webp-wasm"],
-    },
   },
   plugins: [],
 });

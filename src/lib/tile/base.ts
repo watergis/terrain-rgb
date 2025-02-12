@@ -1,5 +1,4 @@
 import { lngLatToGoogle, lngLatToTile } from "global-mercator";
-import webp from "webp-wasm";
 import PNG from "../png";
 
 /**
@@ -70,15 +69,9 @@ export abstract class BaseTile {
       }
       switch (ext) {
         case "png":
-          fetch(url)
-            .then((res) => res.arrayBuffer())
-            .then((res) => {
-              const buffer = new Uint8Array(res);
-              // const binary = Buffer.from(res.data, "binary");
-              const value = this.getValueFromPNG(buffer, tile, lng, lat);
-              resolve(value);
-            })
-            .catch((err) => reject(err));
+          this.getValueFromPNG(url, tile, lng, lat).then((height) => {
+            resolve(height);
+          });
           break;
         case "webp":
           this.getValueFromWebp(url, tile, lng, lat).then((height) => {
@@ -100,16 +93,18 @@ export abstract class BaseTile {
    * @param lat latitude
    * @returns the value calculated from coordinates
    */
-  private getValueFromPNG(
-    binary: Uint8Array,
+  private async getValueFromPNG(
+    url: string,
     tile: number[],
     lng: number,
     lat: number,
-  ): number {
-    const pngImage = PNG.load(binary);
+  ): Promise<number> {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Failed to fetch tile: ${res.statusText}`);
+    const buffer = new Uint8Array(await res.arrayBuffer());
+    const pngImage = PNG.load(buffer);
     const pixels = pngImage.decode();
     const rgba = this.pixels2rgba(pixels, tile, lng, lat);
-    // console.log(rgba)
     const height = this.calc(rgba[0], rgba[1], rgba[2], rgba[3]);
     return height;
   }
@@ -120,23 +115,28 @@ export abstract class BaseTile {
     lng: number,
     lat: number,
   ): Promise<number> {
-    await webp.load();
 
     const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error(`Failed to fetch tile: ${res.statusText}`);
-    }
-    const arrayBuffer = await res.arrayBuffer();
-
-    const imgData = await webp.decode(arrayBuffer);
-    const rgba = this.pixels2rgba(
-      imgData.data as unknown as Uint8Array<ArrayBuffer>,
-      tile,
-      lng,
-      lat,
-    );
-    const value = this.calc(rgba[0], rgba[1], rgba[2], rgba[3]);
-    return value;
+    if (!res.ok) throw new Error(`Failed to fetch tile: ${res.statusText}`);
+    const blob = await res.blob();
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return reject(new Error("Failed to create canvas context"));
+        ctx.drawImage(img, 0, 0);
+        const pixels = ctx.getImageData(0, 0, img.width, img.height).data;
+        const rgba = this.pixels2rgba(new Uint8Array(pixels), tile, lng, lat);
+        // console.log(rgba)
+        const height = this.calc(rgba[0], rgba[1], rgba[2], rgba[3]);
+        resolve(height)
+      };
+      img.onerror = () => reject(new Error("Failed to load WebP image"));
+      img.src = URL.createObjectURL(blob);
+    });
   }
 
   /**

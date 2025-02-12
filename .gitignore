@@ -1,5 +1,8 @@
 es6
 *.inp
+playwright-report/
+test-results/
+.DS_Store
 
 # Logs
 logs
