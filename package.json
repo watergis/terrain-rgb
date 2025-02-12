@@ -1,6 +1,6 @@
 {
   "name": "@watergis/terrain-rgb",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "This module is to get elevation from terrain RGB tilesets by longitude and latitude.",
   "type": "module",
   "main": "dist/terrain-rgb.umd.js",
