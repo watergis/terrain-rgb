@@ -49,9 +49,6 @@ importers:
       lefthook:
         specifier: ^1.10.10
         version: 1.10.10
-      pako:
-        specifier: ^2.1.0
-        version: 2.1.0
       prettier:
         specifier: ^3.5.0
         version: 3.5.0
@@ -1857,12 +1854,6 @@ packages:
         integrity: sha512-+vYvA/Y31l8Zk8dwxHhL3JfTuHPm6tlxM2A3GeQyl7ovYnSp1+mzAxClxaOr0qO1TtPxbQxetI7v5XqKLJZk7Q==,
       }
 
-  pako@2.1.0:
-    resolution:
-      {
-        integrity: sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug==,
-      }
-
   parent-module@1.0.1:
     resolution:
       {
@@ -3417,8 +3408,6 @@ snapshots:
   p-try@2.2.0: {}
 
   package-manager-detector@0.2.9: {}
-
-  pako@2.1.0: {}
 
   parent-module@1.0.1:
     dependencies:
