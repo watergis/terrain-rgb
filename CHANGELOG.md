@@ -1,5 +1,11 @@
 # @watergis/terrain-rgb
 
+## 2.1.1
+
+### Patch Changes
+
+- 3de148a: fix: removed png.ts and pako to fetch PNG tiles by the same approarch of webp with canvas api.
+
 ## 2.1.0
 
 ### Minor Changes
