@@ -14,6 +14,7 @@
           { lat: 29.46279, lng: -2.12171, zoom: 15, expected: 1997 },
           { lat: 29.7676, lng: -2.68676, zoom: 15, expected: 1710 },
           { lat: 30.7823, lng: -2.25379, zoom: 15, expected: 1392 },
+          { lat: 0, lng: 0, zoom: 15, expected: undefined },
         ];
 
         const terrrariumTestCases = [
@@ -22,6 +23,7 @@
           { lat: 29.46279, lng: -2.12171, zoom: 15, expected: 2001 },
           { lat: 29.7676, lng: -2.68676, zoom: 15, expected: 1712 },
           { lat: 30.7823, lng: -2.25379, zoom: 15, expected: 1390 },
+          { lat: 0, lng: 0, zoom: 15, expected: 0 },
         ];
 
         const pngUrl =

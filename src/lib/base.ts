@@ -1,5 +1,4 @@
 import { lngLatToGoogle, lngLatToTile } from "global-mercator";
-import PNG from "../png";
 
 /**
  * Abstract class for terrain RGB tiles
@@ -45,78 +44,66 @@ export abstract class BaseTile {
    * @param z  zoom level
    * @returns the value calculated by certain formula
    */
-  protected getValue(lnglat: number[], z: number): Promise<number> {
-    return new Promise((resolve: (value: number) => void, reject) => {
-      const lng = lnglat[0];
-      const lat = lnglat[1];
-      let zoom = z;
-      if (z > this.maxzoom) {
-        zoom = this.maxzoom;
-      } else if (z < this.minzoom) {
-        zoom = this.minzoom;
-      }
-      const tile = this.tms
-        ? lngLatToTile([lng, lat], zoom)
-        : lngLatToGoogle([lng, lat], zoom);
-      const url: string = this.url
-        .replace(/{x}/g, tile[0].toString())
-        .replace(/{y}/g, tile[1].toString())
-        .replace(/{z}/g, tile[2].toString());
-      let ext = this.getUrlExtension(url);
-      // console.log(ext)
-      if (!ext) {
-        ext = "png";
-      }
-      switch (ext) {
-        case "png":
-          this.getValueFromPNG(url, tile, lng, lat).then((height) => {
-            resolve(height);
-          });
-          break;
-        case "webp":
-          this.getValueFromWebp(url, tile, lng, lat).then((height) => {
-            resolve(height);
-          });
-          break;
-        default:
-          reject(new Error(`Invalid file extension: ${ext}`));
-          break;
-      }
-    });
+  protected getValue(lnglat: number[], z: number): Promise<number | undefined> {
+    return new Promise(
+      (resolve: (value: number | undefined) => void, reject) => {
+        const lng = lnglat[0];
+        const lat = lnglat[1];
+        let zoom = z;
+        if (z > this.maxzoom) {
+          zoom = this.maxzoom;
+        } else if (z < this.minzoom) {
+          zoom = this.minzoom;
+        }
+        const tile = this.tms
+          ? lngLatToTile([lng, lat], zoom)
+          : lngLatToGoogle([lng, lat], zoom);
+        const url: string = this.url
+          .replace(/{x}/g, tile[0].toString())
+          .replace(/{y}/g, tile[1].toString())
+          .replace(/{z}/g, tile[2].toString());
+        let ext = this.getUrlExtension(url);
+        // console.log(ext)
+        if (!ext) {
+          ext = "png";
+        }
+        switch (ext) {
+          case "png":
+          case "webp":
+            this.getValueFromRaster(url, tile, lng, lat).then((height) => {
+              resolve(height);
+            });
+            break;
+          default:
+            reject(new Error(`Invalid file extension: ${ext}`));
+            break;
+        }
+      },
+    );
   }
 
   /**
-   * Get the value calculated from coordinates on PNG raster tileset
-   * @param binary Image binary data
+   * Get the value calculated from coordinates on WEBP raster tileset
+   * @param url tile URL
    * @param tile tile index info
    * @param lng longitude
    * @param lat latitude
-   * @returns the value calculated from coordinates
+   * @returns the value calculated from coordinates. If tile does not exist returns undefined
    */
-  private async getValueFromPNG(
+  private async getValueFromRaster(
     url: string,
     tile: number[],
     lng: number,
     lat: number,
-  ): Promise<number> {
+  ): Promise<number | undefined> {
     const res = await fetch(url);
-    if (!res.ok) throw new Error(`Failed to fetch tile: ${res.statusText}`);
-    const buffer = new Uint8Array(await res.arrayBuffer());
-    const pngImage = PNG.load(buffer);
-    const pixels = pngImage.decode();
-    const rgba = this.pixels2rgba(pixels, tile, lng, lat);
-    const height = this.calc(rgba[0], rgba[1], rgba[2], rgba[3]);
-    return height;
-  }
-
-  private async getValueFromWebp(
-    url: string,
-    tile: number[],
-    lng: number,
-    lat: number,
-  ): Promise<number> {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`Failed to fetch tile: ${res.statusText}`);
+    if (!res.ok) {
+      if (res.status === 404) {
+        return undefined;
+      } else {
+        throw new Error(`Failed to fetch tile: ${res.statusText}`);
+      }
+    }
     const blob = await res.blob();
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -133,7 +120,7 @@ export abstract class BaseTile {
         const height = this.calc(rgba[0], rgba[1], rgba[2], rgba[3]);
         resolve(height);
       };
-      img.onerror = () => reject(new Error("Failed to load WebP image"));
+      img.onerror = () => resolve(undefined);
       img.src = URL.createObjectURL(blob);
     });
   }
@@ -209,20 +196,6 @@ export abstract class BaseTile {
       extension = extension.trim();
     }
     return extension;
-  }
-
-  /**
-   * Get buffer data from Image URI
-   * @param dataURI Image URI
-   * @returns buffer from the image
-   */
-  private dataURIConverter(dataURI: string): Uint8Array {
-    const byteString = atob(dataURI.split(",")[1]);
-    const buffer = new Uint8Array(byteString.length);
-    for (let i = 0; i < byteString.length; i += 1) {
-      buffer[i] = byteString.charCodeAt(i);
-    }
-    return buffer;
   }
 
   /**
