@@ -13,7 +13,7 @@ Decode elevation from Terrain RGB and Terrarium raster tile sets by longitude an
 - **In-flight request deduplication** — multiple lookups on the same tile share one fetch + decode promise.
 - **Batch `getElevations`** — group coordinates by tile to minimize fetch/decode work.
 - **Exact pixel lookup** — tile and pixel come from the same Web Mercator projection, so lookups are accurate at any zoom, on tile edges and for TMS.
-- **Raw decoding** — color management and alpha premultiplication are disabled, so tiles with gamma or ICC metadata decode to their true values.
+- **Raw decoding** — color management and alpha premultiplication are disabled, so tiles with gamma or ICC metadata decode to their true values. Canvas reads can still be perturbed by privacy modes; see [Canvas-free decoding](#canvas-free-decoding).
 - **Pluggable decoder** — pass `decode` to use the library outside the browser.
 
 ## Install
@@ -68,9 +68,28 @@ Tile size is read from each decoded image, so 256 and 512 px tilesets work alike
 
 If a tile cannot be found (404, 204 or an empty body), the method returns `undefined`, and the miss is cached too. Other HTTP errors and undecodable images reject. Any format the browser can decode works (PNG, WebP, Mapbox `.pngraw`…), with or without an extension in the URL.
 
+### Canvas-free decoding
+
+The default decoder reads pixels back from a canvas. Browsers with fingerprinting protection (Brave, Safari's advanced protection, Firefox's strict mode) add noise to canvas reads, and one step in the red channel is 256 m in Terrarium, so the terrain grows spikes. Use the bundled decoder, which never touches a canvas:
+
+```ts
+import { Terrarium } from "dem-tiles";
+import { decodeTile } from "dem-tiles/decoder";
+
+const dem = new Terrarium(url, { decode: decodeTile });
+```
+
+It reads PNG with `fast-png` and WebP with libwebp compiled to WebAssembly (about 50 kB gzip, loaded on the first WebP tile). Both are optional peer dependencies, so install the ones you need:
+
+```sh
+pnpm add fast-png @jsquash/webp
+```
+
+Bundlers must serve the `.wasm` next to its module. With Vite, add `optimizeDeps: { exclude: ["@jsquash/webp"] }`.
+
 ### Outside the browser
 
-The default decoder needs `createImageBitmap` and a canvas. Elsewhere, pass your own:
+The default decoder needs `createImageBitmap` and a canvas. In Node or workers without one, pass a decoder such as `decodeTile` above, or your own:
 
 ```ts
 import { decode } from "fast-png";

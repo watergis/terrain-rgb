@@ -2,17 +2,28 @@ import { defineConfig } from "vite-plus";
 import { playwright } from "vite-plus/test/browser-playwright";
 
 export default defineConfig({
-  pack: {
-    entry: ["src/lib/index.ts"],
-    format: ["esm", "cjs", "umd"],
-    globalName: "demTiles",
-    platform: "browser",
-    dts: true,
-    sourcemap: true,
-    publint: true,
-    attw: { profile: "strict" },
-    deps: { onlyBundle: false },
-  },
+  pack: [
+    {
+      entry: ["src/lib/index.ts"],
+      format: ["esm", "cjs", "umd"],
+      globalName: "demTiles",
+      platform: "browser",
+      dts: true,
+      sourcemap: true,
+      publint: true,
+      attw: { profile: "strict" },
+      deps: { onlyBundle: false },
+    },
+    {
+      entry: ["src/lib/decoder.ts"],
+      format: ["esm", "cjs"],
+      platform: "browser",
+      dts: true,
+      sourcemap: true,
+      clean: false,
+      deps: { onlyBundle: false },
+    },
+  ],
   fmt: {
     ignorePatterns: ["CHANGELOG.md", "dist/**"],
   },

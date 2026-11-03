@@ -30,6 +30,13 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "decoder": [
+        "./dist/decoder.d.ts"
+      ]
+    }
+  },
   "unpkg": "./dist/index.umd.js",
   "jsdelivr": "./dist/index.umd.js",
   "exports": {
@@ -37,7 +44,17 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./decoder": {
+      "import": {
+        "types": "./dist/decoder.d.ts",
+        "default": "./dist/decoder.js"
+      },
+      "require": {
+        "types": "./dist/decoder.d.cts",
+        "default": "./dist/decoder.cjs"
+      }
+    }
   },
   "scripts": {
     "build": "vp pack",
@@ -51,6 +68,7 @@
   "devDependencies": {
     "@arethetypeswrong/core": "^0.18.5",
     "@changesets/cli": "^2.27.12",
+    "@jsquash/webp": "^1.5.0",
     "@mapbox/sphericalmercator": "^2.0.2",
     "@mapbox/tilebelt": "^2.0.3",
     "@stylistic/eslint-plugin": "^5.10.0",
@@ -72,6 +90,18 @@
     "vite": "catalog:",
     "vite-plus": "catalog:",
     "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@jsquash/webp": "^1.5.0",
+    "fast-png": "^8.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@jsquash/webp": {
+      "optional": true
+    },
+    "fast-png": {
+      "optional": true
+    }
   },
   "engines": {
     "node": "^22.12.0 || >=24.0.0"
